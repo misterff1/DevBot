@@ -1,7 +1,7 @@
--------------------------------------------------------------------------------------------------------------------------------------
-----|	   												 	 DevBot  v0.1.1											  		    |----
-----|			    					 			    A JC-MP Community project											    |----
--------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------
+----|			  DevBot  v0.1.2			|----
+----|		A JC-MP Community project		|----
+-------------------------------------------------
 
 class 'DevBot'
 
@@ -14,7 +14,8 @@ function DevBot:__init()
 		MessageQueue 					= 					{}
 		TriggerTable					=					{}
 
-		BotName							=					"[DevBot]: "
+		BotName							=					"devbot" 		-- must be lowercase!
+		BotTag							=					"[DevBot]: "
 		BotColor						=					Color( 255, 255, 255 )
 		
 		self.numtick					=					0
@@ -25,62 +26,49 @@ end
 
 function DevBot:PlayerChat( args )
 		
-		local cmd_args 					= 					args.text:split( " " )
-		local text 						=					args.text
-		local lowertext					=					string.lower(text)
-		
+		local lowertext					=					string.lower(args.text)
 		
 		if self.enabled then
 		
 		
-			if lowertext == "devbot" or lowertext == "hey devbot" then
-			
-				if args.player:GetValue("DevBotActive")	== false or args.player:GetValue("DevBotActive") == nil then
-				
+			if lowertext == BotName or lowertext == "hey " .. BotName then
+				if args.player:GetValue("BotActive")	== false or args.player:GetValue("BotActive") == nil then
+					
 					table.insert( MessageQueue, "Yes my lord?" )
-					args.player:SetValue("DevBotActive", true)
-			
+					args.player:SetValue("BotActive", true)
+					
 				else
-				
+					
 					table.insert( MessageQueue, "I'm already active, ask me anything!" )
-				
+					
 				end
-			
 			end
-		
-		
-		
-		
-			if lowertext == "devbot learn this" or lowertext == "devbot, learn this" or lowertext == "devbot, learn this:" or lowertext == "devbot learn this:" then
-				
-				if args.player:GetValue("DevBotLearningStage0") == false or args.player:GetValue("DevBotLearningStage0") == nil then
-				
-					args.player:SetValue("DevBotLearningStage0", true)
-				
+
+			
+			if lowertext == BotName .. " learn this" or lowertext == BotName .. ", learn this" or lowertext == BotName .. " learn this:" or lowertext == BotName .. ", learn this:" then
+				if args.player:GetValue("BotLearningStage0") == false or args.player:GetValue("BotLearningStage0") == nil then
+					
+					args.player:SetValue("BotLearningStage0", true)
+					
 				end
-				
 			end
-		
 			
-			if args.player:GetValue("DevBotLearningStage0") == true then
-				
-				if string.sub(lowertext, 1, 10) == [[trigger: "]] and string.sub(lowertext, lowertext.len(lowertext)) == [["]] then
-				
-					local trigger = string.sub(lowertext, 11, lowertext.len(lowertext) - 1)
+			
+			if args.player:GetValue("BotLearningStage0") == true then
+				if string.sub(lowertext, 1, 9) == [[trigger: ]] then
+					
+					local trigger = string.sub(lowertext, 11, lowertext.len(lowertext))
 					args.player:SetValue("TriggerValue", trigger)
-					args.player:SetValue("DevBotLearningStage1", true)
+					args.player:SetValue("BotLearningStage1", true)
 					
 				end
-			
 			end
+
 			
-			
-			
-			if args.player:GetValue("DevBotLearningStage1") == true then
-				
-				if string.sub(lowertext, 1, 9) == [[answer: "]] and string.sub(lowertext, lowertext.len(lowertext)) == [["]] then
+			if args.player:GetValue("BotLearningStage1") == true then
+				if string.sub(lowertext, 1, 8) == [[answer: ]] then
 					
-					local answer = string.sub(lowertext, 10, lowertext.len(lowertext) - 1)
+					local answer = string.sub(lowertext, 9, lowertext.len(lowertext))
 					args.player:SetValue("AnswerValue", answer)
 					
 					local triggervalue		=		args.player:GetValue("TriggerValue")
@@ -92,70 +80,88 @@ function DevBot:PlayerChat( args )
 					args.player:SetValue("TriggerValue", nil)
 					args.player:SetValue("AnswerValue", nil)
 					
-					args.player:SetValue("DevBotLearningStage0", false)
-					args.player:SetValue("DevBotLearningStage1", false)
+					args.player:SetValue("BotLearningStage0", false)
+					args.player:SetValue("BotLearningStage1", false)
+
+				end
+			end
+			
+			
+			if lowertext == BotName .. " remove this" or lowertext == BotName .. ", remove this" or lowertext == BotName .. " remove this:" or lowertext == BotName .. ", remove this:" then
+				if args.player:GetValue("BotRemoval") == false or args.player:GetValue("BotRemoval") == nil then
+					
+					args.player:SetValue("BotRemoval", true)
 					
 				end
-				
 			end
 			
 			
+			if args.player:GetValue("BotRemoval") == true then
+				if string.sub(lowertext, 1, 9) == [[trigger: ]] then
+					
+					local trigger = string.sub(lowertext, 10, lowertext.len(lowertext))
+					args.player:SetValue("TriggerValue", trigger)
+					
+					local triggervalue		=		args.player:GetValue("TriggerValue")
+					
+					TriggerTable[triggervalue] = nil
+					table.insert( MessageQueue, "Got it. I removed that one for you." )
+					
+					args.player:SetValue("TriggerValue", nil)
+					args.player:SetValue("BotRemoval", false)
+					
+				end
+			end
 			
 			
-			if lowertext:find("thanks") and lowertext:find("devbot") then
+			if lowertext:find("thanks") and lowertext:find(BotName) then
 			
 				table.insert( MessageQueue, "You're welcome." )
-				args.player:SetValue("DevBotActive", false)
+				args.player:SetValue("BotActive", false)
 				
 			end
-		
-		
-		
-		
-			if lowertext == "devbot go away" or lowertext == "devbot, go away" then
+
+			
+			if lowertext:find("never mind") and lowertext:find(BotName) then
+			
+				table.insert( MessageQueue, "Okay, let me know when you need me." )
+				args.player:SetValue("BotActive", false)
+				
+			end
+			
+			
+			if lowertext == BotName .. " go away" or lowertext == BotName .. ", go away" then
 				
 				table.insert( MessageQueue, "Okay, I'll disable myself for a bit" )
 				self.enabled = false
-				args.player:SetValue("DevBotActive", false)
+				args.player:SetValue("BotActive", false)
 				
 			end																			  
-		
-		
-		
-		
-			if args.player:GetValue("DevBotActive") == true then
-		
-				for trigger, value in pairs(TriggerTable) do
+
 			
+			if args.player:GetValue("BotActive") == true or string.sub(lowertext, 1, 6) == [[devbot]] then
+				for trigger, value in pairs(TriggerTable) do
 					if lowertext:find(trigger) then
 				
 						DevBotMessage = value
 						table.insert( MessageQueue, DevBotMessage )
-						args.player:SetValue("DevBotActive", false)
+						args.player:SetValue("BotActive", false)
 						
 					end
-				
 				end
-			
 			end
 			
-			
 		end
+
 		
-		
-		
-		
-		if lowertext == "devbot activate yourself" or lowertext == "devbot, activate yourself" or lowertext == "devbot, activate" or lowertext == "devbot activate" then
-			
-			if args.player:GetValue("DevBotActive") == false then
+		if lowertext == BotName .. " activate yourself" or lowertext == BotName .. ", activate yourself" or lowertext == BotName .. " activate" then
+			if args.player:GetValue("BotActive") == false then
 				
 				table.insert( MessageQueue, "Hi! Did you miss me?" )
 				self.enabled = true
 			
 			end
-				
 		end
-		
 
 end
 
@@ -178,7 +184,7 @@ function DevBot:ProcessQueue()
 
 		for k, message in ipairs(MessageQueue) do 
 		
-			Chat:Broadcast( BotName .. message, BotColor) 
+			Chat:Broadcast( BotTag .. message, BotColor) 
 			table.remove(MessageQueue, k) 
 			
 		end
