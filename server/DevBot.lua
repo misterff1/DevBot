@@ -1,6 +1,6 @@
 -------------------------------------------------
-----|			  DevBot  v0.1.2			|----
-----|		A JC-MP Community project		|----
+----|			  DevBot  v0.1.3			|----
+----|		 By Misterff1 and Dev_34		|----
 -------------------------------------------------
 
 class 'DevBot'
@@ -14,7 +14,7 @@ function DevBot:__init()
 		MessageQueue 					= 					{}
 		TriggerTable					=					{}
 
-		BotName							=					"devbot" 		-- must be lowercase!
+		BotName							=					"devbot"
 		BotTag							=					"[DevBot]: "
 		BotColor						=					Color( 255, 255, 255 )
 		
@@ -57,7 +57,7 @@ function DevBot:PlayerChat( args )
 			if args.player:GetValue("BotLearningStage0") == true then
 				if string.sub(lowertext, 1, 9) == [[trigger: ]] then
 					
-					local trigger = string.sub(lowertext, 11, lowertext.len(lowertext))
+					local trigger = string.sub(lowertext, 10, lowertext.len(lowertext))
 					args.player:SetValue("TriggerValue", trigger)
 					args.player:SetValue("BotLearningStage1", true)
 					
@@ -138,21 +138,41 @@ function DevBot:PlayerChat( args )
 				
 			end																			  
 
-			
+			----------------------------------------------------------------------------------------------------
 			if args.player:GetValue("BotActive") == true or string.sub(lowertext, 1, 6) == [[devbot]] then
+
+				if string.sub(lowertext, 1, 6) == [[devbot]] then
+					lowertext = string.sub(lowertext, 7)
+				end
+
+				lowertext = lowertext:gsub("^%s*(.-)%s*$", "%1")
 				for trigger, value in pairs(TriggerTable) do
 					if lowertext:find(trigger) then
-				
-						DevBotMessage = value
-						table.insert( MessageQueue, DevBotMessage )
-						args.player:SetValue("BotActive", false)
-						
+						if trigger.len(trigger) == lowertext.len(lowertext) then
+							DevBotMessage = value
+						elseif string.sub(lowertext, 1, trigger.len(trigger) + 1) == trigger .. " " then
+							DevBotMessage = value
+						elseif string.sub(lowertext, lowertext.len(lowertext) - trigger.len(trigger)) == " " .. trigger then
+							DevBotMessage = value
+						elseif string.find(lowertext, "%s" .. trigger) and string.find(lowertext, trigger .. "%s") then
+							DevBotMessage = value
+						else
+							-- False positive
+						end
+						---
+						if DevBotMessage ~= nil then
+							table.insert( MessageQueue, DevBotMessage )
+							DevBotMessage = nil
+							args.player:SetValue("BotActive", false)
+						end
 					end
 				end
 			end
-			
 		end
-
+		
+		
+			----------------------------------------------------------------------------------------------------
+		
 		
 		if lowertext == BotName .. " activate yourself" or lowertext == BotName .. ", activate yourself" or lowertext == BotName .. " activate" then
 			if args.player:GetValue("BotActive") == false then
