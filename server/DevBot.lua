@@ -1,6 +1,6 @@
 -------------------------------------------------
-----|			  DevBot  v0.1.3			|----
-----|		 By Misterff1 and Dev_34		|----
+----|		  DevBot  v0.1.3 	    |----
+----|	      By Misterff1 and Dev_3	    |----
 -------------------------------------------------
 
 class 'DevBot'
@@ -11,22 +11,22 @@ function DevBot:__init()
 		Events:Subscribe( "PlayerChat", self, self.PlayerChat )
 		Events:Subscribe( "PostTick", self, self.PostTick )
 		
-		MessageQueue 					= 					{}
-		TriggerTable					=					{}
+		MessageQueue 				= 				{}
+		TriggerTable				=				{}
 
-		BotName							=					"devbot"
-		BotTag							=					"[DevBot]: "
-		BotColor						=					Color( 255, 255, 255 )
+		BotName					=				"devbot"
+		BotTag					=				"[DevBot]: "
+		BotColor				=				Color( 255, 255, 255 )
 		
-		self.numtick					=					0
-		self.enabled					=					true
+		self.numtick				=				0
+		self.enabled				=				true
 		
 end
 
 
 function DevBot:PlayerChat( args )
 		
-		local lowertext					=					string.lower(args.text)
+		local lowertext				=				string.lower(args.text)
 		
 		if self.enabled then
 		
@@ -171,7 +171,7 @@ function DevBot:PlayerChat( args )
 		end
 		
 		
-			----------------------------------------------------------------------------------------------------
+		----------------------------------------------------------------------------------------------------
 		
 		
 		if lowertext == BotName .. " activate yourself" or lowertext == BotName .. ", activate yourself" or lowertext == BotName .. " activate" then
